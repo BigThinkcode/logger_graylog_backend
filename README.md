@@ -25,7 +25,7 @@ config :logger, backends: [LoggerGraylogBackend.Tcp]
 and then configure the backend itself:
 
 ```elixir
-config :logger, LoggerGraylogBackend.Tcp,
+config :logger_graylog_backend, LoggerGraylogBackend.Tcp,
   host: "your-graylog-hostname",
   port: 12201,
   # other options...
@@ -57,7 +57,7 @@ payload by default:
 In addition, all metadata provided by Logger will be included as additional fields (thus prefixed
 with `_`). What metadata is included in the message is also configurable.
 
-#### Conifugration
+#### Configuration
 
 You can configure the formatter using the following options:
 
@@ -78,7 +78,7 @@ You can configure the formatter using the following options:
 ```elixir
 config :logger, backends: [LoggerGraylogBackend.Tcp]
 
-config :logger, LoggerGraylogBackend.Tcp,
+config :logger_graylog_backend, LoggerGraylogBackend.Tcp,
   host: "example.com",
   port: 12201,
   level: :warn,
