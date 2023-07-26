@@ -163,13 +163,12 @@ defmodule LoggerGraylogBackend.Tcp do
 
     case :gen_tcp.send(socket, [log, 0]) do
       :ok ->
+        IO.inspect("Message sent to graylog", label: "GraylogBackend success")
         :ok
 
       {:error, reason} ->
         Logger.error(fn ->
-          "Couldn't send log message to Graylog at #{format_endpoint(host, port)}: #{
-            inspect(reason)
-          }"
+          "Couldn't send log message to Graylog at #{format_endpoint(host, port)}: #{inspect(reason)}"
         end)
 
         :error
@@ -205,7 +204,7 @@ defmodule LoggerGraylogBackend.Tcp do
     case :gen_tcp.connect(host, port, [:binary, active: false], 5000) do
       {:ok, socket} ->
         Logger.info(fn -> "Connected to #{format_endpoint(host, port)}" end)
-        {_, backoff} = :backoff.succeed(backoff)
+        {_, _backoff} = :backoff.succeed(backoff)
         %{state | socket: {:connected, socket}}
 
       {:error, reason} ->
@@ -213,9 +212,7 @@ defmodule LoggerGraylogBackend.Tcp do
         set_reconnection_timer(reconnect_in)
 
         Logger.error(fn ->
-          "Couldn't connect to #{format_endpoint(host, port)}: #{inspect(reason)}. Retrying in #{
-            reconnect_in
-          }s"
+          "Couldn't connect to #{format_endpoint(host, port)}: #{inspect(reason)}. Retrying in #{reconnect_in}s"
         end)
 
         %{state | backoff: backoff}
@@ -235,7 +232,7 @@ defmodule LoggerGraylogBackend.Tcp do
     "#{host}:#{port}"
   end
 
-  @spec set_reconnection_timer(seconds :: non_neg_integer()) :: :ok
+  @spec set_reconnection_timer(seconds :: non_neg_integer()) :: reference()
   defp set_reconnection_timer(seconds) do
     :erlang.start_timer(seconds * 1000, self(), :reconnect)
   end

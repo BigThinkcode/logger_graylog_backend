@@ -42,7 +42,7 @@ defmodule LoggerGraylogBackend.GelfFormatter do
     timestamp_field = maybe_timestamp_field(timestamp, opts)
 
     additional_fields =
-      metadata |> Enum.map(fn {k, v} -> {["_", to_string(k)], v} end) |> Enum.into(%{})
+      metadata |> Enum.map(fn {k, v} -> validate_metadata_format(k, v) end) |> Enum.into(%{})
 
     mandatory_fields
     |> Map.merge(timestamp_field)
@@ -51,6 +51,14 @@ defmodule LoggerGraylogBackend.GelfFormatter do
   end
 
   ## Helpers
+
+  defp validate_metadata_format(key, value) do
+    if is_tuple(value) do
+      {["_", to_string(key)], Tuple.to_list(value)}
+    else
+      {["_", to_string(key)], value}
+    end
+  end
 
   @spec maybe_timestamp_field(timestamp, Keyword.t()) :: map
   defp maybe_timestamp_field(timestamp, opts) do
